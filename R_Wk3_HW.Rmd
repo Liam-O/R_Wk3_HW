@@ -4,8 +4,8 @@ date: "July 30, 2016"
 output: html_document
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, tidy = TRUE)
+```{r setup, include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(tidy = TRUE)
 
 # Running and downloading, if necessary, the required packages for this excercise
 if(!require("RCurl", character.only = TRUE, quietly = TRUE)) {
