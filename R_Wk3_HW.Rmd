@@ -4,7 +4,7 @@ date: "July 30, 2016"
 output: html_document
 ---
 
-```{r setup, include = FALSE, echo = FALSE}
+```{r setup, include = FALSE, ehco = FALSE}
 knitr::opts_chunk$set(tidy = TRUE)
 
 # Running and downloading, if necessary, the required packages for this excercise
