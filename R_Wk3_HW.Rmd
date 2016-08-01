@@ -1,0 +1,66 @@
+---
+author: "Liam Byrne"
+date: "July 30, 2016"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, tidy = TRUE)
+
+# Running and downloading, if necessary, the required packages for this excercise
+if(!require("RCurl", character.only = TRUE, quietly = TRUE)) {
+    install.packages("RCurl")
+    library("RCurl", character.only = TRUE)
+}
+
+if(!require("plyr", character.only = TRUE, quietly = TRUE)) {
+    install.packages("plyr")
+    library("plyr", character.only = TRUE)
+}
+```
+
+### R Bridge - Week 3 Assignment:
+
+**Using mushroom records drawn from *The Audubon Society Field Guide to North American Mushrooms (1981)* found at [the UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Mushroom), study the dataset and create a data frame and a select subset of columns. The data and columns should be given meaningful, proper names.**
+
+#### I. Getting and Reading the Data
+The URL is accessed using the [getURL](https://cran.r-project.org/web/packages/RCurl/RCurl.pdf#page=42) funciton from the [RCurl](https://cran.r-project.org/web/packages/RCurl/RCurl.pdf) package and the data is read using the [read.csv](https://stat.ethz.ch/R-manual/R-devel/library/utils/html/read.table.html) function. From inspeciton of the data, we can see that there are no headers and that the data are delimited by commas.
+```{r echo = TRUE}
+mush_URL <- getURL("https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data")
+
+mush_df <- read.csv(text = mush_URL, header = FALSE, sep = ",", stringsAsFactors = FALSE, strip.white = TRUE)
+```
+
+Again from inspeciton, the data are single character values with no header description. The descriptions, and more information of the dataset, are found in the [mushroom's data dicitonary](https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.names).
+
+#### II. Making the Data more Readable
+There are 23 columns in this dataset. For the sake of example, let us just look at four columns, i.e., class, cap color, odor, spore print color and habitat. The column headers were given default names when the data frame was created:
+```{r echo = TRUE}
+names(mush_df)
+```
+
+Our aforementioned columns are located under V1, V4, V6 and V21 and V23. Let's create a subset of these columns then give them more proper names.
+```{r echo = TRUE}
+mush_sub1 <- subset(mush_df, select = c(V1, V4, V6, V21, V23))
+
+names(mush_sub1) <- c("class", "cap_color", "odor", "spore_print_color", "habitat")
+
+head(mush_sub1)
+```
+Our data are still single character representations of characteristics. Referencing the [mushroom's dataset dicitonary]("https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.names") again, we can decode these seemingly cryptic descriptions. There are many ways, and perhaps very elgant ways, to alter the data. The most intuitive method, I believe, is the [mapvalues funciton](https://cran.r-project.org/web/packages/plyr/plyr.pdf) from the [plyr]("https://cran.r-project.org/web/packages/plyr/plyr.pdf#page=36") package. Using the *mapvalues* funciton for the subset and displaying the top of the dataset we get:
+```{r echo = TRUE}
+mush_sub1$class <- mapvalues(mush_sub1$class, from = c("e", "p"), to = c("edible", "poisonous"))
+mush_sub1$cap_color <- mapvalues(mush_sub1$cap_color,
+                                 from = c("n", "b", "c", "g", "r", "p", "u", "e", "w", "y"),
+                                 to = c("brown", "buff", "cinnamon", "gray", "green", "pink", "purple", "red", "white", "yellow"))
+mush_sub1$odor <- mapvalues(mush_sub1$odor,
+                                 from = c("a", "l", "c", "y", "f", "m", "n", "p", "s"),
+                                 to = c("almond", "anise", "creosote", "fishy", "foul", "musty", "none", "pungent", "spicy"))
+mush_sub1$spore_print_color <- mapvalues(mush_sub1$spore_print_color,
+                                         from = c("k", "n", "b", "h", "r", "o", "u", "w", "y"),
+                                         to = c("black", "brown", "buff", "chocolate", "green", "orange", "purple", "white", "yellow"))
+mush_sub1$habitat <- mapvalues(mush_sub1$habitat,
+                               from = c("g", "l", "m", "p", "u", "w", "d"),
+                               to = c("grasses", "leaves", "meadows", "paths", "urban", "waste", "wood"))
+head(mush_sub1)
+```
